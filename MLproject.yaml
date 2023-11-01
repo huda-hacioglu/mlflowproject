@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 name: PROJECT
 
 conda_env: conda.yaml  
@@ -11,18 +10,4 @@ entry_points:
       max_depth: {type: int, default: 2}
       random_state: {type: int, default: 35}
       real_testssize: {type: float, default: 0.4}
-=======
-name: PROJECT
-
-conda_env: conda.yaml  
-
-entry_points:
-  main:
-    parameters:
-      learning_rate: {type: float, default: 0.1}
-      n_estimators: {type: int, default: 100}
-      max_depth: {type: int, default: 2}
-      random_state: {type: int, default: 35}
-      real_testssize: {type: float, default: 0.4}
->>>>>>> 94f46d322f8c0df7b2b118d658be13f969b47f57
     command: "python my_script.py {learning_rate} {n_estimators} {max_depth} {random_state} {real_testssize}"
