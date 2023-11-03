@@ -1,9 +1,7 @@
 name: base
-channels:
-- conda-forge
 dependencies:
 - python=3.11.5
-- pip<=23.2.1
+- pip
 - pip:
   - mlflow==2.7.1
   - cloudpickle==2.2.1

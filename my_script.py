@@ -7,7 +7,7 @@ from sklearn.metrics import accuracy_score
 import os
 
 
-df = pd.read_csv("my_mlflow_project\Lung Cancer.csv")
+df = pd.read_csv("Lung Cancer.csv")
 df['LUNG_CANCER'] = df['LUNG_CANCER'].replace({'YES': 1, 'NO': 0})
 df['GENDER'] = df['GENDER'].replace({'M': 0, 'F': 1})
 X=df[['GENDER','AGE', 'SMOKING', 'YELLOW_FINGERS', 'ANXIETY','PEER_PRESSURE', 'CHRONIC DISEASE', 'FATIGUE ', 'ALLERGY ', 'WHEEZING','ALCOHOL CONSUMING', 'COUGHING', 'SHORTNESS OF BREATH','SWALLOWING DIFFICULTY', 'CHEST PAIN']]
@@ -43,18 +43,44 @@ import mlflow
 import mlflow.sklearn
 import matplotlib.pyplot as plt
 
-mlflow.set_experiment("Experiment")
+mlflow.set_tracking_uri('http://192.168.1.45:5000/')
 
-results= XGBOOST(X_train, y_train, X_test, y_test)
+experiment_name = "MLFlow Project Deneme"
 
-colors = ['red', 'green', 'blue', 'purple']
+experiment = mlflow.get_experiment_by_name(experiment_name)
 
-plt.bar(["Accuracy","Mean squared error","r squared"],[results[0],results[1],results[2]],color=colors)
-plt.xlabel('Parameters')
-plt.ylabel('Values')
-plt.title('Results Comparison')
-plt.legend()
-plt.grid(True)
+if experiment is None:
+    experiment_id = mlflow.create_experiment(experiment_name)
+    print(f"Created experiment '{experiment_name}' with ID {experiment_id}")
+else:
+    experiment_id = experiment.experiment_id
+    print(f"Experiment '{experiment_name}' already exists with ID {experiment_id}. You can display the run from that page")
 
-# Save the bar chart as an artifact
-plt.savefig("Results_Comparison.png")
+def generate_next_run_name(experiment_id):
+    runs = mlflow.search_runs(experiment_ids=[experiment_id], filter_string='')
+    num_runs = len(runs)
+    return f"test{num_runs + 1}"
+
+with mlflow.start_run(experiment_id=experiment_id) as run:
+
+    results= XGBOOST(X_train, y_train, X_test, y_test)
+
+    mlflow.log_param("test size", real_testssize)
+    mlflow.log_metric("accuracy", results[0])
+    mlflow.log_metric("mean squared error", results[1])
+    mlflow.log_metric("r squared", results[2])
+
+    colors = ['red', 'green', 'blue', 'purple']
+
+    plt.bar(["Accuracy","Mean squared error","r squared"],[results[0],results[1],results[2]],color=colors)
+    plt.xlabel('Parameters')
+    plt.ylabel('Values')
+    plt.title('Results Comparison')
+
+    plt.grid(True)
+
+    # Save the bar chart as an artifact
+    plt.savefig("Results_Comparison.png")
+    mlflow.log_artifact("Results_Comparison.png")
+
+mlflow.end_run()
